@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mi primer juego | GameMaker</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --bg: #08111f;
+        --bg-card: #101c2d;
+        --bg-card-2: #0d1727;
+        --text: #edf5ff;
+        --muted: #9baabd;
+        --primary: #00c2ff;
+        --primary-dark: #008fc2;
+        --green: #38d996;
+        --yellow: #ffc857;
+        --red: #ff6b6b;
+        --border: rgba(255,255,255,.09);
+        --radius: 18px;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(circle at 20% 0%, rgba(0,194,255,.12), transparent 30%),
+            radial-gradient(circle at 80% 20%, rgba(56,217,150,.08), transparent 25%),
+            var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+    }
+
+    button {
+        font-family: inherit;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(8,17,31,.88);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+        max-width: 1150px;
+        margin: auto;
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-weight: 800;
+        letter-spacing: -.5px;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, var(--primary), #2363b5);
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        box-shadow: 0 0 25px rgba(0,194,255,.25);
+    }
+
+    .logo span {
+        color: var(--primary);
+    }
+
+    .progress-container {
+        width: 250px;
+    }
+
+    .progress-text {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: rgba(255,255,255,.08);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--primary), var(--green));
+        transition: width .3s ease;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero {
+        max-width: 1150px;
+        margin: auto;
+        padding: 85px 24px 55px;
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(0,194,255,.09);
+        border: 1px solid rgba(0,194,255,.2);
+        color: var(--primary);
+        border-radius: 100px;
+        padding: 7px 13px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .hero h1 {
+        max-width: 800px;
+        font-size: clamp(38px, 7vw, 70px);
+        line-height: .98;
+        letter-spacing: -3px;
+        margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+        color: var(--primary);
+    }
+
+    .hero p {
+        max-width: 680px;
+        color: var(--muted);
+        font-size: 17px;
+        margin-bottom: 35px;
+    }
+
+    .mission {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(56,217,150,.08);
+        border: 1px solid rgba(56,217,150,.2);
+        border-radius: 14px;
+        padding: 13px 17px;
+        color: #dfffee;
+        font-size: 14px;
+    }
+
+    /* =========================
+       LAYOUT
+    ========================= */
+
+    .layout {
+        max-width: 1150px;
+        margin: auto;
+        padding: 0 24px 80px;
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 35px;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 100px;
+        align-self: start;
+    }
+
+    .sidebar-title {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 13px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        text-align: left;
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-bottom: 4px;
+        transition: .2s;
+    }
+
+    .nav-item:hover {
+        background: rgba(255,255,255,.05);
+        color: var(--text);
+    }
+
+    .nav-item.active {
+        background: rgba(0,194,255,.1);
+        color: var(--primary);
+    }
+
+    .nav-number {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: rgba(255,255,255,.06);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .nav-item.completed .nav-number {
+        background: rgba(56,217,150,.15);
+        color: var(--green);
+    }
+
+    /* =========================
+       CONTENT
+    ========================= */
+
+    main {
+        min-width: 0;
+    }
+
+    .step {
+        scroll-margin-top: 100px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: linear-gradient(
+            145deg,
+            rgba(16,28,45,.96),
+            rgba(13,23,39,.96)
+        );
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 15px 50px rgba(0,0,0,.12);
+    }
+
+    .step-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 17px;
+        margin-bottom: 24px;
+    }
+
+    .step-icon {
+        min-width: 52px;
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        border-radius: 15px;
+        background: rgba(0,194,255,.1);
+        border: 1px solid rgba(0,194,255,.16);
+        font-size: 24px;
+    }
+
+    .step-number {
+        color: var(--primary);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    h2 {
+        font-size: 28px;
+        line-height: 1.15;
+        letter-spacing: -.8px;
+    }
+
+    h3 {
+        font-size: 19px;
+        margin: 28px 0 12px;
+    }
+
+    p {
+        color: #c5d0df;
+        margin-bottom: 15px;
+    }
+
+    strong {
+        color: var(--text);
+    }
+
+    /* =========================
+       INFO BOXES
+    ========================= */
+
+    .info {
+        border-left: 3px solid var(--primary);
+        background: rgba(0,194,255,.06);
+        padding: 15px 17px;
+        border-radius: 0 10px 10px 0;
+        margin: 20px 0;
+    }
+
+    .info-title {
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .tip {
+        border-left-color: var(--green);
+        background: rgba(56,217,150,.06);
+    }
+
+    .tip .info-title {
+        color: var(--green);
+    }
+
+    .warning {
+        border-left-color: var(--yellow);
+        background: rgba(255,200,87,.06);
+    }
+
+    .warning .info-title {
+        color: var(--yellow);
+    }
+
+    /* =========================
+       CODE
+    ========================= */
+
+    .code-wrapper {
+        position: relative;
+        margin: 17px 0;
+    }
+
+    pre {
+        background: #060d18;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 12px;
+        padding: 20px;
+        overflow-x: auto;
+        color: #dce9f8;
+        font-family: Consolas, Monaco, monospace;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .copy {
+        position: absolute;
+        right: 9px;
+        top: 9px;
+        background: rgba(255,255,255,.07);
+        color: var(--muted);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 7px;
+        padding: 6px 9px;
+        cursor: pointer;
+        font-size: 11px;
+    }
+
+    .copy:hover {
+        color: white;
+        background: rgba(255,255,255,.12);
+    }
+
+    .code-comment {
+        color: #6d8198;
+    }
+
+    /* =========================
+       STEPS
+    ========================= */
+
+    .instructions {
+        counter-reset: instruction;
+    }
+
+    .instruction {
+        display: flex;
+        gap: 13px;
+        margin: 18px 0;
+    }
+
+    .instruction-number {
+        flex-shrink: 0;
+        width: 29px;
+        height: 29px;
+        border-radius: 50%;
+        background: rgba(0,194,255,.12);
+        color: var(--primary);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 12px;
+    }
+
+    .instruction p {
+        margin: 2px 0 0;
+    }
+
+    /* =========================
+       CHECKLIST
+    ========================= */
+
+    .checklist {
+        margin-top: 25px;
+        display: grid;
+        gap: 9px;
+    }
+
+    .check {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 12px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: 10px;
+        cursor: pointer;
+        color: #b9c6d7;
+        transition: .2s;
+    }
+
+    .check:hover {
+        background: rgba(255,255,255,.05);
+    }
+
+    .check input {
+        appearance: none;
+        width: 19px;
+        height: 19px;
+        border: 1px solid #52657d;
+        border-radius: 5px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .check input:checked {
+        background: var(--green);
+        border-color: var(--green);
+    }
+
+    .check input:checked::after {
+        content: "✓";
+        color: #07131e;
+        font-weight: 900;
+        position: absolute;
+        left: 3px;
+        top: -1px;
+    }
+
+    .check:has(input:checked) {
+        color: #dfffee;
+        border-color: rgba(56,217,150,.15);
+        background: rgba(56,217,150,.05);
+    }
+
+    /* =========================
+       DIAGRAM
+    ========================= */
+
+    .diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 25px;
+        margin: 20px 0;
+        background: rgba(255,255,255,.025);
+        border-radius: 13px;
+        border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .diagram-box {
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: #14243a;
+        border: 1px solid rgba(255,255,255,.1);
+        text-align: center;
+    }
+
+    .diagram-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    .arrow {
+        color: var(--primary);
+        font-size: 20px;
+    }
+
+    /* =========================
+       KEYBOARD
+    ========================= */
+
+    .keys {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin: 25px 0;
+    }
+
+    kbd {
+        min-width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        padding: 0 10px;
+        background: linear-gradient(#253850, #142237);
+        border: 1px solid #40546c;
+        border-bottom-width: 3px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 800;
+        box-shadow: 0 4px 0 rgba(0,0,0,.3);
+    }
+
+    /* =========================
+       MISSION
+    ========================= */
+
+    .mission-card {
+        background:
+            linear-gradient(135deg, rgba(0,194,255,.1), rgba(56,217,150,.05)),
+            var(--bg-card);
+        border: 1px solid rgba(0,194,255,.2);
+    }
+
+    .mission-card h2 {
+        color: var(--primary);
+    }
+
+    .reward {
+        margin-top: 20px;
+        padding: 18px;
+        border-radius: 12px;
+        background: rgba(255,200,87,.06);
+        border: 1px solid rgba(255,200,87,.15);
+        color: #ffe5a7;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+        max-width: 1150px;
+        margin: auto;
+        padding: 0 24px 50px;
+        text-align: center;
+        color: #66778c;
+        font-size: 12px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 850px) {
+        .layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+            position: static;
+        }
+
+        .sidebar nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+
+        .progress-container {
+            width: 150px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .hero {
+            padding-top: 55px;
+        }
+
+        .hero h1 {
+            letter-spacing: -2px;
+        }
+
+        .card {
+            padding: 21px;
+        }
+
+        .header-inner {
+            padding: 0 15px;
+        }
+
+        .logo-text {
+            display: none;
+        }
+
+        .progress-container {
+            width: 180px;
+        }
+
+        .sidebar nav {
+            grid-template-columns: 1fr;
+        }
+
+        .diagram {
+            flex-direction: column;
+        }
+
+        .arrow {
+            transform: rotate(90deg);
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+
+        <div class="logo">
+            <div class="logo-icon">🎮</div>
+            <div class="logo-text">
+                Mi primer <span>GameMaker</span>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-text">
+                <span>Progreso</span>
+                <span id="progressText">0%</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+    </div>
+</header>
+
+
+<section class="hero">
+
+    <div class="tag">
+        ● NIVEL 1 · DESDE CERO
+    </div>
+
+    <h1>
+        Tu primer juego<br>
+        en <span>GameMaker.</span>
+    </h1>
+
+    <p>
+        Una guía paso a paso para aprender a utilizar GameMaker
+        creando tu propio personaje, moviéndolo y agregando
+        tu primer enemigo.
+    </p>
+
+    <div class="mission">
+        🎯 <strong>Misión:</strong>
+        terminar una pequeña escena jugable.
+    </div>
+
+</section>
+
+
+<div class="layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+            Misiones
+        </div>
+
+        <nav id="navigation">
+
+            <button class="nav-item active" data-target="step1">
+                <span class="nav-number">1</span>
+                Crear proyecto
+            </button>
+
+            <button class="nav-item" data-target="step2">
+                <span class="nav-number">2</span>
+                Crear Sprite
+            </button>
+
+            <button class="nav-item" data-target="step3">
+                <span class="nav-number">3</span>
+                Crear Objeto
+            </button>
+
+            <button class="nav-item" data-target="step4">
+                <span class="nav-number">4</span>
+                Crear Room
+            </button>
+
+            <button class="nav-item" data-target="step5">
+                <span class="nav-number">5</span>
+                Colocar jugador
+            </button>
+
+            <button class="nav-item" data-target="step6">
+                <span class="nav-number">6</span>
+                Hacerlo caminar
+            </button>
+
+            <button class="nav-item" data-target="step7">
+                <span class="nav-number">7</span>
+                Crear enemigo
+            </button>
+
+            <button class="nav-item" data-target="step8">
+                <span class="nav-number">8</span>
+                Probar el juego
+            </button>
+
+            <button class="nav-item" data-target="step9">
+                <span class="nav-number">9</span>
+                Misión final
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main>
+
+
+        <!-- =========================
+             PASO 1
+        ========================== -->
+
+        <section class="step" id="step1">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🚀</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 01
+                        </div>
+
+                        <h2>Crear nuestro proyecto</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Antes de comenzar necesitamos crear el proyecto
+                    donde estará nuestro juego.
+                </p>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Abre <strong>GameMaker</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            En la pantalla inicial selecciona
+                            <strong>New → GameMaker Language</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Si aparece la selección de plantilla,
+                            elige <strong>Blank Game</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">4</div>
+
+                        <p>
+                            Ponle como nombre:
+                            <strong>MiPrimerJuego</strong>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info tip">
+                    <div class="info-title">💡 IMPORTANTE</div>
+
+                    <p>
+                        Guarda el proyecto en una carpeta que puedas
+                        encontrar fácilmente.
+                    </p>
+                </div>
+
+                <div class="checklist">
+                    <label class="check">
+                        <input type="checkbox">
+                        Tengo mi proyecto creado.
+                    </label>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 2
+        ========================== -->
+
+        <section class="step" id="step2">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🖼️</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 02
+                        </div>
+
+                        <h2>Crear nuestro primer Sprite</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Un <strong>Sprite</strong> es una imagen que podemos
+                    utilizar dentro del juego.
+                </p>
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        🧍<br>
+                        <small>Personaje</small>
+                    </div>
+
+                    <div class="diagram-box">
+                        👾<br>
+                        <small>Enemigo</small>
+                    </div>
+
+                    <div class="diagram-box">
+                        🪙<br>
+                        <small>Moneda</small>
+                    </div>
+
+                </div>
+
+                <h3>Crear el Sprite</h3>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Busca el panel
+                            <strong>Asset Browser</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Busca la carpeta
+                            <strong>Sprites</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Haz clic derecho sobre
+                            <strong>Sprites</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">4</div>
+
+                        <p>
+                            Selecciona
+                            <strong>Create → Sprite</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">5</div>
+
+                        <p>
+                            Llámalo:
+                            <strong>spr_player</strong>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info">
+                    <div class="info-title">🧠 ¿QUÉ SIGNIFICA spr_player?</div>
+
+                    <p>
+                        <strong>spr</strong> nos indica que es un Sprite.
+                        <strong>player</strong> significa jugador.
+                    </p>
+                </div>
+
+                <h3>🎨 Ahora dibuja tu personaje</h3>
+
+                <p>
+                    Abre el Sprite haciendo doble clic sobre él.
+                    Utiliza el editor de imágenes de GameMaker para
+                    crear tu personaje.
+                </p>
+
+                <p>
+                    No necesitas hacer un dibujo perfecto.
+                    Puede ser un cuadrado, un robot, un personaje,
+                    una nave o lo que quieras.
+                </p>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé mi Sprite.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Lo llamé spr_player.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Dibujé mi personaje.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 3
+        ========================== -->
+
+        <section class="step" id="step3">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">📦</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 03
+                        </div>
+
+                        <h2>Crear nuestro primer Objeto</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Ahora tenemos la imagen del personaje.
+                    Pero necesitamos algo que pueda
+                    <strong>hacer cosas</strong>.
+                </p>
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        🖼️ Sprite
+                        <small>¿Cómo se ve?</small>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="diagram-box">
+                        📦 Objeto
+                        <small>¿Qué hace?</small>
+                    </div>
+
+                </div>
+
+                <div class="info">
+                    <div class="info-title">🧠 CONCEPTO CLAVE</div>
+
+                    <p>
+                        El <strong>Sprite</strong> es la apariencia.
+                        El <strong>Objeto</strong> representa algo que
+                        existe dentro del juego y puede tener comportamiento.
+                    </p>
+                </div>
+
+                <h3>Crear el objeto</h3>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            En <strong>Asset Browser</strong>,
+                            busca <strong>Objects</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Haz clic derecho →
+                            <strong>Create → Object</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Ponle el nombre:
+                            <strong>obj_player</strong>
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">4</div>
+
+                        <p>
+                            Busca la propiedad
+                            <strong>Sprite</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">5</div>
+
+                        <p>
+                            Selecciona
+                            <strong>spr_player</strong>.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info tip">
+                    <div class="info-title">💡 RECUERDA</div>
+
+                    <p>
+                        Ahora tenemos:
+                    </p>
+
+                    <div class="diagram">
+
+                        <div class="diagram-box">
+                            spr_player
+                            <small>Imagen</small>
+                        </div>
+
+                        <div class="arrow">→</div>
+
+                        <div class="diagram-box">
+                            obj_player
+                            <small>Personaje dentro del juego</small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé obj_player.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Le asigné spr_player.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 4
+        ========================== -->
+
+        <section class="step" id="step4">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🏠</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 04
+                        </div>
+
+                        <h2>Crear nuestra Room</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Una <strong>Room</strong> es el lugar donde ocurre
+                    nuestro juego.
+                </p>
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        🏠 Room
+                        <small>Escenario del juego</small>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="diagram-box">
+                        🧍 + 👾
+                        <small>Objetos</small>
+                    </div>
+
+                </div>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Busca <strong>Rooms</strong> en el
+                            Asset Browser.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Haz clic derecho →
+                            <strong>Create → Room</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Ponle:
+                            <strong>rm_game</strong>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info">
+                    <div class="info-title">📌 ¿QUÉ ES UNA ROOM?</div>
+
+                    <p>
+                        Imagina que estás construyendo una película.
+                        La Room sería el escenario donde ocurre la escena.
+                    </p>
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé rm_game.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 5
+        ========================== -->
+
+        <section class="step" id="step5">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🧍</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 05
+                        </div>
+
+                        <h2>Colocar al personaje</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Ya tenemos nuestro escenario.
+                    Ahora vamos a colocar nuestro personaje dentro.
+                </p>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Abre <strong>rm_game</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Busca <strong>obj_player</strong>
+                            en el Asset Browser.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Arrastra <strong>obj_player</strong>
+                            dentro de la Room.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info warning">
+                    <div class="info-title">⚠️ OJO</div>
+
+                    <p>
+                        No arrastres directamente
+                        <strong>spr_player</strong>.
+                        Debes colocar <strong>obj_player</strong>.
+                    </p>
+                </div>
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        🧍
+                        <small>obj_player</small>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="diagram-box">
+                        🏠 Room
+                        <small>Personaje colocado</small>
+                    </div>
+
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Coloqué obj_player en la Room.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 6
+        ========================== -->
+
+        <section class="step" id="step6">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🕹️</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 06
+                        </div>
+
+                        <h2>Hacer que el personaje camine</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    ¡Ahora sí!
+                    Vamos a programar nuestro personaje.
+                </p>
+
+                <div class="info">
+                    <div class="info-title">💻 VAMOS A USAR GML</div>
+
+                    <p>
+                        GML es el lenguaje de programación de GameMaker.
+                        Lo utilizaremos para decirle al personaje qué debe hacer.
+                    </p>
+                </div>
+
+                <h3>➡️ Mover hacia la derecha</h3>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Abre <strong>obj_player</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Pulsa <strong>Add Event</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Selecciona:
+                            <strong>Key Down → Right</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">4</div>
+
+                        <p>
+                            Escribe:
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="code-wrapper">
+
+<pre><code>x += 4;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+                <div class="info tip">
+                    <div class="info-title">🧠 ¿QUÉ SIGNIFICA?</div>
+
+                    <p>
+                        <strong>x</strong> representa la posición horizontal
+                        del objeto.
+                    </p>
+
+                    <p>
+                        <strong>x += 4</strong> significa:
+                        mover el objeto 4 píxeles hacia la derecha.
+                    </p>
+                </div>
+
+
+                <h3>⬅️ Mover hacia la izquierda</h3>
+
+                <p>
+                    Crea otro evento:
+                    <strong>Key Down → Left</strong>.
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>x -= 4;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+
+                <h3>⬆️ Mover hacia arriba</h3>
+
+                <p>
+                    Crea:
+                    <strong>Key Down → Up</strong>.
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>y -= 4;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+
+                <h3>⬇️ Mover hacia abajo</h3>
+
+                <p>
+                    Crea:
+                    <strong>Key Down → Down</strong>.
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>y += 4;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        ⬆️<br>
+                        <small>y - 4</small>
+                    </div>
+
+                    <div class="diagram-box">
+                        ⬅️ 🧍 ➡️
+                        <small>x - 4 / x + 4</small>
+                    </div>
+
+                    <div class="diagram-box">
+                        ⬇️<br>
+                        <small>y + 4</small>
+                    </div>
+
+                </div>
+
+                <div class="info">
+                    <div class="info-title">🧠 RECUERDA</div>
+
+                    <p>
+                        <strong>X</strong> controla izquierda y derecha.
+                    </p>
+
+                    <p>
+                        <strong>Y</strong> controla arriba y abajo.
+                    </p>
+                </div>
+
+                <div class="keys">
+                    <kbd>←</kbd>
+                    <kbd>↑</kbd>
+                    <kbd>↓</kbd>
+                    <kbd>→</kbd>
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé el evento Right.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé el evento Left.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé el evento Up.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé el evento Down.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 7
+        ========================== -->
+
+        <section class="step" id="step7">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">👾</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 07
+                        </div>
+
+                        <h2>Crear nuestro primer enemigo</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Nuestro personaje ya puede moverse.
+                    Ahora vamos a crear algo que pueda encontrar
+                    dentro del juego.
+                </p>
+
+                <h3>🎨 Crear el Sprite del enemigo</h3>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Ve a
+                            <strong>Sprites → Create → Sprite</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Llámalo:
+                            <strong>spr_enemy</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Dibuja tu propio enemigo.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="info tip">
+                    <div class="info-title">🎨 TU DISEÑO</div>
+
+                    <p>
+                        Puede ser un alien, robot, fantasma,
+                        monstruo, nave o cualquier cosa que quieras.
+                    </p>
+                </div>
+
+
+                <h3>📦 Crear el Objeto enemigo</h3>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Ve a
+                            <strong>Objects → Create → Object</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Llámalo:
+                            <strong>obj_enemy</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            Asígnale el Sprite:
+                            <strong>spr_enemy</strong>.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="diagram">
+
+                    <div class="diagram-box">
+                        spr_enemy
+                        <small>Imagen del enemigo</small>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="diagram-box">
+                        obj_enemy
+                        <small>Enemigo dentro del juego</small>
+                    </div>
+
+                </div>
+
+
+                <h3>📍 Colocarlo en la Room</h3>
+
+                <p>
+                    Abre nuevamente <strong>rm_game</strong>
+                    y arrastra <strong>obj_enemy</strong>
+                    dentro del escenario.
+                </p>
+
+                <div class="diagram">
+
+                    <div style="font-size:30px;">
+                        🧍
+                    </div>
+
+                    <div style="flex:1; max-width:220px;">
+                        <div style="
+                            height:3px;
+                            background:rgba(255,255,255,.15);
+                        "></div>
+                    </div>
+
+                    <div style="font-size:30px;">
+                        👾
+                    </div>
+
+                </div>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé spr_enemy.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Creé obj_enemy.
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        Coloqué el enemigo en la Room.
+                    </label>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PASO 8
+        ========================== -->
+
+        <section class="step" id="step8">
+
+            <div class="card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">▶️</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN 08
+                        </div>
+
+                        <h2>Probar nuestro juego</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Llegó el momento de comprobar si todo funciona.
+                </p>
+
+                <div class="instructions">
+
+                    <div class="instruction">
+                        <div class="instruction-number">1</div>
+
+                        <p>
+                            Guarda tu proyecto.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">2</div>
+
+                        <p>
+                            Pulsa el botón
+                            <strong>▶ Run</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">3</div>
+
+                        <p>
+                            También puedes utilizar
+                            <strong>F6</strong>.
+                        </p>
+                    </div>
+
+                    <div class="instruction">
+                        <div class="instruction-number">4</div>
+
+                        <p>
+                            Prueba las flechas del teclado.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="keys">
+                    <kbd>←</kbd>
+                    <kbd>↑</kbd>
+                    <kbd>↓</kbd>
+                    <kbd>→</kbd>
+                </div>
+
+                <div class="info tip">
+                    <div class="info-title">🎉 SI TODO FUNCIONA...</div>
+
+                    <p>
+                        Deberías tener un personaje que se mueve
+                        por la pantalla y un enemigo dentro de la escena.
+                    </p>
+                </div>
+
+                <h3>🚨 ¿Tu personaje no se mueve?</h3>
+
+                <p>
+                    No borres todo. Comprueba estos puntos:
+                </p>
+
+                <div class="checklist">
+
+                    <label class="check">
+                        <input type="checkbox">
+                        ¿Creaste los 4 eventos?
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        ¿Escribiste correctamente el código?
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        ¿Colocaste obj_player en la Room?
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        ¿Guardaste el proyecto?
+                    </label>
+
+                    <label class="check">
+                        <input type="checkbox">
+                        ¿Estás ejecutando la Room correcta?
+                    </label>
+
+                </div>
+
+                <div class="info warning">
+                    <div class="info-title">⚠️ ¿APARECIÓ UN ERROR?</div>
+
+                    <p>
+                        Lee el mensaje de error. GameMaker normalmente
+                        indica dónde encontró el problema.
+                        No significa que hayas arruinado el proyecto.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MISIÓN FINAL
+        ========================== -->
+
+        <section class="step" id="step9">
+
+            <div class="card mission-card">
+
+                <div class="step-header">
+
+                    <div class="step-icon">🏆</div>
+
+                    <div>
+                        <div class="step-number">
+                            MISIÓN FINAL
+                        </div>
+
+                        <h2>Personaliza tu juego</h2>
+                    </div>
+
+                </div>
+
+                <p>
+                    Ya conoces las herramientas básicas.
+                    Ahora toca experimentar.
+                </p>
+
+                <h3>🎨 1. Personaliza tu personaje</h3>
+
+                <p>
+                    Cambia el diseño de <strong>spr_player</strong>.
+                </p>
+
+                <div class="checklist">
+                    <label class="check">
+                        <input type="checkbox">
+                        Personalicé mi personaje.
+                    </label>
+                </div>
+
+
+                <h3>👾 2. Personaliza tu enemigo</h3>
+
+                <p>
+                    Cambia el diseño de <strong>spr_enemy</strong>.
+                </p>
+
+                <div class="checklist">
+                    <label class="check">
+                        <input type="checkbox">
+                        Personalicé mi enemigo.
+                    </label>
+                </div>
+
+
+                <h3>⚡ 3. Cambia la velocidad</h3>
+
+                <p>
+                    Busca uno de tus códigos de movimiento.
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>x += 4;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+                <p>
+                    Cambia el <strong>4</strong> por:
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>x += 2;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+                <p>
+                    Después prueba:
+                </p>
+
+                <div class="code-wrapper">
+
+<pre><code>x += 8;</code></pre>
+
+<button class="copy" onclick="copyCode(this)">
+Copiar
+</button>
+
+                </div>
+
+                <p>
+                    ¿Qué diferencia notas?
+                </p>
+
+                <div class="checklist">
+                    <label class="check">
+                        <input type="checkbox">
+                        Probé diferentes velocidades.
+                    </label>
+                </div>
+
+
+                <h3>👾 4. Agrega otro enemigo</h3>
+
+                <p>
+                    Coloca una segunda instancia de
+                    <strong>obj_enemy</strong> en la Room.
+                </p>
+
+                <div class="diagram">
+
+                    <div style="font-size:35px;">🧍</div>
+
+                    <div style="font-size:35px;">👾</div>
+
+                    <div style="font-size:35px;">👾</div>
+
+                </div>
+
+                <div class="checklist">
+                    <label class="check">
+                        <input type="checkbox">
+                        Agregué otro enemigo.
+                    </label>
+                </div>
+
+
+                <div class="reward">
+                    🏆 <strong>¡Misión completada!</strong>
+
+                    <br><br>
+
+                    Si llegaste hasta aquí, ya creaste tu primer
+                    pequeño juego en GameMaker desde cero.
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<footer>
+    Mi primer GameMaker · Nivel 1 · Introducción a GameMaker Language
+</footer>
+
+
+<script>
+
+    /* ==================================
+       NAVEGACIÓN
+    ================================== */
+
+    const navItems = document.querySelectorAll(".nav-item");
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", () => {
+
+            const target = document.getElementById(
+                item.dataset.target
+            );
+
+            target.scrollIntoView({
+                behavior: "smooth"
+            });
+
+        });
+
+    });
+
+
+    /* ==================================
+       COPIAR CÓDIGO
+    ================================== */
+
+    function copyCode(button) {
+
+        const code = button
+            .parentElement
+            .querySelector("code")
+            .innerText;
+
+        navigator.clipboard.writeText(code);
+
+        const original = button.innerText;
+
+        button.innerText = "¡Copiado!";
+
+        setTimeout(() => {
+            button.innerText = original;
+        }, 1200);
+    }
+
+
+    /* ==================================
+       CHECKLIST + PROGRESO
+    ================================== */
+
+    const checks = document.querySelectorAll(
+        '.check input[type="checkbox"]'
+    );
+
+    const progressFill =
+        document.getElementById("progressFill");
+
+    const progressText =
+        document.getElementById("progressText");
+
+
+    function updateProgress() {
+
+        const total = checks.length;
+
+        let completed = 0;
+
+        checks.forEach(check => {
+
+            if (check.checked) {
+                completed++;
+            }
+
+        });
+
+        const percentage =
+            Math.round((completed / total) * 100);
+
+        progressFill.style.width =
+            percentage + "%";
+
+        progressText.innerText =
+            percentage + "%";
+
+
+        /* Guardar progreso */
+
+        localStorage.setItem(
+            "gamemaker-progress",
+            JSON.stringify(
+                [...checks].map(check => check.checked)
+            )
+        );
+    }
+
+
+    /* ==================================
+       CARGAR PROGRESO
+    ================================== */
+
+    const savedProgress =
+        localStorage.getItem("gamemaker-progress");
+
+    if (savedProgress) {
+
+        const values =
+            JSON.parse(savedProgress);
+
+        checks.forEach((check, index) => {
+
+            if (values[index]) {
+                check.checked = true;
+            }
+
+        });
+
+        updateProgress();
+    }
+
+
+    checks.forEach(check => {
+
+        check.addEventListener(
+            "change",
+            updateProgress
+        );
+
+    });
+
+
+    /* ==================================
+       DETECTAR SECCIÓN ACTIVA
+    ================================== */
+
+    const sections =
+        document.querySelectorAll(".step");
+
+    const observer =
+        new IntersectionObserver(
+
+            entries => {
+
+                entries.forEach(entry => {
+
+                    if (entry.isIntersecting) {
+
+                        navItems.forEach(item => {
+                            item.classList.remove("active");
+                        });
+
+                        const active =
+                            document.querySelector(
+                                `[data-target="${entry.target.id}"]`
+                            );
+
+                        if (active) {
+                            active.classList.add("active");
+                        }
+
+                    }
+
+                });
+
+            },
+
+            {
+                rootMargin: "-20% 0px -60% 0px"
+            }
+
+        );
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+</script>
+
+</body>
+</html>
